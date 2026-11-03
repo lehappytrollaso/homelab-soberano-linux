@@ -1,0 +1,23 @@
+services:
+  agent:
+    build:
+      context: .
+      dockerfile: Containerfile
+    container_name: sovereign-linux-agent
+    restart: unless-stopped
+    volumes:
+      - ./data:/app/data:Z
+      - ./logs:/app/logs:Z
+      - ./config/agent.yaml:/app/config/agent.yaml:ro,Z
+    environment:
+      - PYTHONUNBUFFERED=1
+      - TZ=Europe/Madrid
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    network_mode: host
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2048M

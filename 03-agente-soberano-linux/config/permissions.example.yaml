@@ -1,0 +1,57 @@
+# ==============================================================================
+# PERFILES Y CONTROL DE ACCESO BASADO EN ROLES (RBAC)
+# ==============================================================================
+# Define las herramientas y comandos permitidos para cada nivel de usuario.
+# ==============================================================================
+
+roles:
+  # Propietario del servidor: Acceso completo y ejecución sin restricciones
+  owner:
+    description: "Propietario y administrador total del sistema"
+    can_execute_system_commands: true
+    can_manage_media: true
+    can_browse_web: true
+    can_transcribe_voice: true
+    can_generate_images: true
+    can_manage_calendar: true
+    command_whitelist:
+      - "*"
+
+  # Administrador delegado: Gestión de servicios y medios
+  admin:
+    description: "Administrador de servicios y mantenimiento"
+    can_execute_system_commands: true
+    can_manage_media: true
+    can_browse_web: true
+    can_transcribe_voice: true
+    can_generate_images: true
+    can_manage_calendar: false
+    command_whitelist:
+      - "uptime"
+      - "df"
+      - "free"
+      - "docker ps"
+      - "docker-compose ps"
+      - "systemctl status *"
+
+  # Usuario estándar (Familia / Convivientes): Peticiones multimedia e información
+  user:
+    description: "Usuario habitual del hogar"
+    can_execute_system_commands: false
+    can_manage_media: true
+    can_browse_web: true
+    can_transcribe_voice: true
+    can_generate_images: true
+    can_manage_calendar: false
+    command_whitelist: []
+
+  # Invitado: Solo conversación básica y consulta de estado
+  guest:
+    description: "Usuario externo no verificado"
+    can_execute_system_commands: false
+    can_manage_media: false
+    can_browse_web: false
+    can_transcribe_voice: false
+    can_generate_images: false
+    can_manage_calendar: false
+    command_whitelist: []

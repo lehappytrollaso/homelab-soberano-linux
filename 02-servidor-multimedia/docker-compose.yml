@@ -1,0 +1,128 @@
+services:
+  # 1. JELLYFIN: Servidor multimedia y streaming
+  jellyfin:
+    image: lscr.io/linuxserver/jellyfin:latest
+    container_name: jellyfin
+    environment:
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}
+      - TZ=${TZ:-Europe/Madrid}
+      - JELLYFIN_PublishedServerUrl=http://homelab.local:8096
+    volumes:
+      - ${STORAGE_ROOT}/config/jellyfin:/config
+      - ${STORAGE_ROOT}:/data
+    ports:
+      - "${PORT_JELLYFIN:-8096}:8096"
+    devices:
+      # Passthrough de aceleración por hardware Intel QuickSync / Iris Xe (VA-API)
+      - /dev/dri:/dev/dri
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 4096M
+
+  # 2. JELLYSEERR: Portal de peticiones para usuarios
+  jellyseerr:
+    image: fallenbagel/jellyseerr:latest
+    container_name: jellyseerr
+    environment:
+      - LOG_LEVEL=debug
+      - TZ=${TZ:-Europe/Madrid}
+      - PORT=5055
+    volumes:
+      - ${STORAGE_ROOT}/config/jellyseerr:/app/config
+    ports:
+      - "${PORT_JELLYSEERR:-5055}:5055"
+    restart: unless-stopped
+
+  # 3. RADARR: Automatización y ciclo de vida de Películas
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    environment:
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}
+      - TZ=${TZ:-Europe/Madrid}
+    volumes:
+      - ${STORAGE_ROOT}/config/radarr:/config
+      - ${STORAGE_ROOT}:/data
+    ports:
+      - "${PORT_RADARR:-7878}:7878"
+    restart: unless-stopped
+
+  # 4. SONARR: Automatización y ciclo de vida de Series
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    environment:
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}
+      - TZ=${TZ:-Europe/Madrid}
+    volumes:
+      - ${STORAGE_ROOT}/config/sonarr:/config
+      - ${STORAGE_ROOT}:/data
+    ports:
+      - "${PORT_SONARR:-8989}:8989"
+    restart: unless-stopped
+
+  # 5. PROWLARR: Proxy e indexador centralizado de trackers Torznab
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    environment:
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}
+      - TZ=${TZ:-Europe/Madrid}
+    volumes:
+      - ${STORAGE_ROOT}/config/prowlarr:/config
+    ports:
+      - "${PORT_PROWLARR:-9696}:9696"
+    restart: unless-stopped
+
+  # 6. BAZARR: Búsqueda y sincronización de subtítulos
+  bazarr:
+    image: lscr.io/linuxserver/bazarr:latest
+    container_name: bazarr
+    environment:
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}
+      - TZ=${TZ:-Europe/Madrid}
+    volumes:
+      - ${STORAGE_ROOT}/config/bazarr:/config
+      - ${STORAGE_ROOT}:/data
+    ports:
+      - "${PORT_BAZARR:-6767}:6767"
+    restart: unless-stopped
+
+  # 7. QBITTORRENT: Cliente de descargas BitTorrent
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    environment:
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}
+      - TZ=${TZ:-Europe/Madrid}
+      - WEBUI_PORT=8080
+      - TORRENTING_PORT=6881
+    volumes:
+      - ${STORAGE_ROOT}/config/qbittorrent:/config
+      - ${STORAGE_ROOT}:/data
+    ports:
+      - "${PORT_QBITTORRENT:-8080}:8080"
+      - "6881:6881"
+      - "6881:6881/udp"
+    restart: unless-stopped
+
+  # 8. FLARESOLVERR: Evasión automatizada de Cloudflare Turnstile en indexadores
+  flaresolverr:
+    image: ghcr.io/flaresolverr/flaresolverr:latest
+    container_name: flaresolverr
+    environment:
+      - LOG_LEVEL=info
+      - LOG_HTML=false
+      - CAPTCHA_SOLVER=none
+      - TZ=${TZ:-Europe/Madrid}
+    ports:
+      - "${PORT_FLARESOLVERR:-8191}:8191"
+    restart: unless-stopped

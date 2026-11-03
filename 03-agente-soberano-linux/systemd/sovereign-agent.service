@@ -1,0 +1,25 @@
+[Unit]
+Description=Agente Autonomo Soberano Linux (Sovereign Agent)
+After=network.target network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/sovereign-agent
+ExecStart=%h/sovereign-agent/venv/bin/python3 -m src.main
+Restart=always
+RestartSec=5s
+Environment=PYTHONUNBUFFERED=1
+Environment=TZ=Europe/Madrid
+Environment=PATH=%h/sovereign-agent/venv/bin:/usr/local/bin:/usr/bin:/bin
+StandardOutput=journal
+StandardError=journal
+
+# Endurecimiento del proceso
+NoNewPrivileges=true
+ProtectSystem=full
+ProtectHome=read-only
+ReadWritePaths=%h/sovereign-agent/data %h/sovereign-agent/logs
+
+[Install]
+WantedBy=default.target

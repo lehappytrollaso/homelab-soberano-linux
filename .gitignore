@@ -1,0 +1,59 @@
+# Entornos y credenciales
+.env
+.env.*
+!.env.example
+!.env.*.example
+*.key
+*.pem
+*.crt
+*.pfx
+*.p12
+id_rsa*
+id_ed25519*
+
+# Configuraciones con datos reales (conservar plantillas .example)
+*.yaml
+*.yml
+!*.example.yaml
+!*.example.yml
+!docker-compose*.yml
+!compose*.yml
+
+# Almacenamiento local, bases de datos y sesiones
+data/
+logs/
+media/
+torrents/
+downloads/
+*.db
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
+.sessions/
+waha_sessions/
+browser_session.json
+
+# Python y entornos virtuales
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Modelos y pesos pesados
+*.safetensors
+*.onnx
+*.bin
+*.tar.gz
+*.iso
+
+# Sistema operativo y editores
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*~

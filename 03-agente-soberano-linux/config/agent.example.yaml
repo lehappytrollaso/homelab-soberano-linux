@@ -1,0 +1,143 @@
+# ==============================================================================
+# CONFIGURACIÓN DEL AGENTE AUTÓNOMO SOBERANO (PLANTILLA GENÉRICA)
+# ==============================================================================
+app:
+  name: "Agente Soberano Linux"
+  env: "production"
+  log_level: "INFO"
+  data_dir: "./data"
+  log_dir: "./logs"
+  enable_progress_feedback: true
+
+# Control de acceso e identidad de usuarios
+access_control:
+  enabled: true
+  default_role: "guest"
+  roles_config_path: "config/permissions.example.yaml"
+  users:
+    # Sustituye por tu Telegram Chat ID o tu número de WhatsApp en formato E.164:
+    123456789:
+      role: "owner"
+      name: "Propietario"
+    # 987654321:
+    #   role: "user"
+    #   name: "Familiar"
+
+# Inferencia de Inteligencia Artificial (LLM)
+inference:
+  # Opciones:
+  # - 'agy_proxy': Reutiliza la sesión activa de Antigravity CLI local ($0 coste por token)
+  # - 'direct_api': Conexión directa a la API de Google GenAI con GEMINI_API_KEY
+  provider: "direct_api"
+  model: "gemini-3.8-flash-high"
+  fast_model: "gemini-3.8-flash-low"
+  temperature: 0.2
+  max_output_tokens: 4096
+  dynamic_routing: true
+  show_model_tag: true
+
+# Canal de comunicación activo: "telegram", "whatsapp" o "multi" (ambos simultáneos)
+messaging:
+  channel: "telegram"
+
+# Configuración Telegram
+telegram:
+  bot_token: "TU_TELEGRAM_BOT_TOKEN"
+  allowed_chat_ids:
+    - 123456789
+  enable_voice_transcription: true
+  debounce_seconds: 2.5
+
+# Configuración WhatsApp (vía WAHA - WhatsApp HTTP API / Baileys)
+whatsapp:
+  waha_base_url: "http://127.0.0.1:3000"
+  waha_session: "default"
+  engine: "NOWEB"
+  api_key: "TU_WAHA_API_KEY"
+  webhook_hmac_key: "TU_WAHA_WEBHOOK_HMAC_SECRET"
+  allowed_phone_numbers:
+    - "34600000000"
+  webhook_host: "127.0.0.1"
+  webhook_port: 8088
+  debounce_seconds: 2.0
+  simulate_typing: true
+
+# Transcripción de notas de voz en CPU local
+transcription:
+  enabled: true
+  model: "large-v3-turbo"
+  beam_size: 5
+  device: "cpu"
+  compute_type: "int8"
+  language: "es"
+
+# Síntesis de voz local (TTS Piper VITS ONNX en Castellano Peninsular Estándar)
+tts:
+  enabled: true
+  provider: "piper_onnx"
+  model_path: "data/models/piper/es_ES-carlfm-high.onnx"
+  models_dir: "data/models/piper"
+  default_voice: "carlfm-high"
+  default_lang: "es"
+  speed: 1.0
+  mode: "on_demand"
+  output_dir: "./data/media/audio"
+
+# Integración con el ecosistema Servarr
+media_automation:
+  enabled: true
+  radarr:
+    url: "http://127.0.0.1:7878"
+    api_key: "TU_RADARR_API_KEY"
+    root_folder: "/data/media/movies"
+    quality_profile: "HD-1080p"
+  sonarr:
+    url: "http://127.0.0.1:8989"
+    api_key: "TU_SONARR_API_KEY"
+    root_folder: "/data/media/tv"
+    quality_profile: "HD-1080p"
+  prowlarr:
+    url: "http://127.0.0.1:9696"
+    api_key: "TU_PROWLARR_API_KEY"
+  bazarr:
+    url: "http://127.0.0.1:6767"
+    api_key: "TU_BAZARR_API_KEY"
+
+qbittorrent:
+  url: "http://127.0.0.1:8080"
+  username: "admin"
+  password: "TU_QBITTORRENT_PASSWORD"
+
+# Automatizaciones y tareas programadas del agente
+scheduler:
+  timezone: "Europe/Madrid"
+  heartbeat_interval_seconds: 20
+  morning_briefing:
+    enabled: true
+    time: "08:30"
+  media_daily_audit:
+    enabled: true
+    time: "03:00"
+    transcode_oversized:
+      enabled: false
+
+# Navegación web autónoma (Playwright Headless)
+browser:
+  headless: true
+  slow_mo_ms: 50
+  timeout_ms: 30000
+  storage_state_path: "./data/browser_session.json"
+  user_agent: "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
+
+# Sandbox de ejecución de comandos del sistema
+sandbox:
+  require_confirmation: true
+  allowed_commands:
+    - "uptime"
+    - "df"
+    - "free"
+    - "date"
+    - "systemctl status *"
+    - "docker ps"
+    - "docker-compose ps"
+  timeout_seconds: 120

@@ -1,0 +1,36 @@
+services:
+  waha:
+    image: devlikeapro/waha:latest
+    container_name: waha-whatsapp-gateway
+    restart: unless-stopped
+    mem_limit: 1536m
+    ports:
+      # Expuesto exclusivamente en localhost para proteger la sesión
+      - "127.0.0.1:3000:3000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      # Motor NOWEB: Basado en Baileys (@whiskeysockets/baileys), ultra-ligero y sin navegador Chromium
+      - WHATSAPP_DEFAULT_ENGINE=NOWEB
+      - NODE_OPTIONS=--max-old-space-size=1024
+      - WHATSAPP_API_PORT=3000
+      - WHATSAPP_FILES_FOLDER=/app/.media
+      - WAHA_ZIP_LOGS=false
+      - WAHA_PRINT_QR=false
+      - WAHA_DASHBOARD_ENABLED=true
+      - WAHA_SWAGGER_ENABLED=false
+      - WAHA_API_KEY=${WAHA_API_KEY:?WAHA_API_KEY obligatoria en .env}
+      - WAHA_DASHBOARD_USERNAME=${WAHA_DASHBOARD_USERNAME:-admin}
+      - WAHA_DASHBOARD_PASSWORD=${WAHA_DASHBOARD_PASSWORD:?WAHA_DASHBOARD_PASSWORD obligatoria en .env}
+      # Webhook con autenticación criptográfica HMAC entregado al agente local en el puerto 8088
+      - WHATSAPP_HOOK_URL=${WHATSAPP_HOOK_URL:-http://host.docker.internal:8088/webhook/waha}
+      - WHATSAPP_HOOK_HMAC_KEY=${WHATSAPP_HOOK_HMAC_KEY:?WHATSAPP_HOOK_HMAC_KEY obligatoria en .env}
+      - WHATSAPP_HOOK_EVENTS=message,state.change
+      - TZ=Europe/Madrid
+    volumes:
+      - ./data/waha_sessions:/app/.sessions
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
